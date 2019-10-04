@@ -1,0 +1,18 @@
+parameters:
+#    Banco MySql
+#    database_driver: pdo_mysql
+#    server_version: 5.7
+#    database_user: 'root'
+#    database_password: 'root'
+#    database_host: 'localhost'
+#    database_port: '3306'
+#    database_dbname: 'my_test'
+
+#   Banco Postgresql
+    database_driver: pdo_pgsql
+    database_version: 9.6
+    database_user: 'postgres'
+    database_password: 'postgres'
+    database_host: 'localhost'
+    database_port: '5432'
+    database_dbname: 'my_test'

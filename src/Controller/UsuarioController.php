@@ -3,10 +3,17 @@
 namespace App\Controller;
 
 use App\Entity\Usuario;
+use App\Service\JsonResponseService;
 use App\Service\SerializerService;
 use App\Service\UsuarioService;
 use App\Service\ValidatorService;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Doctrine\ORM\OptimisticLockException;
+use Doctrine\ORM\ORMException;
+use FOS\RestBundle\Controller\AbstractFOSRestController;
+use FOS\RestBundle\Controller\Annotations\Get;
+use FOS\RestBundle\Controller\Annotations\Post;
+use JMS\Serializer\Exception\InvalidArgumentException;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -19,28 +26,28 @@ use Throwable;
  *
  * @package App\Controller
  */
-class UsuarioController extends AbstractController
+class UsuarioController extends AbstractFOSRestController
 {
     /** @var UsuarioService */
     private $usuarioService;
 
-    /** @var ValidatorService */
-    private $validatorService;
+    /** @var JsonResponseService */
+    private $jsonResponseService;
 
     /**
      * UsuarioController constructor.
      *
-     * @param UsuarioService   $usuarioService
-     * @param ValidatorService $validatorService
+     * @param UsuarioService      $usuarioService
+     * @param JsonResponseService $jsonResponseService
      */
-    public function __construct(UsuarioService $usuarioService, ValidatorService $validatorService)
+    public function __construct(UsuarioService $usuarioService, JsonResponseService $jsonResponseService)
     {
         $this->usuarioService = $usuarioService;
-        $this->validatorService = $validatorService;
+        $this->jsonResponseService = $jsonResponseService;
     }
 
     /**
-     * @Route("/perfil", name="perfil", methods={"GET"})
+     * @Get("/perfil", name="perfil")
      *
      * @return JsonResponse
      */
@@ -50,29 +57,22 @@ class UsuarioController extends AbstractController
     }
 
     /**
-     * @Route("/criarconta", name="criar_conta", methods={"POST"})
+     * @Post("/criarconta", name="criar_conta")
      *
      * @param Request $request
      *
-     * @return JsonResponse
+     * @return Response
+     * @throws ORMException
+     * @throws OptimisticLockException
      */
-    public function criarContaAction(Request $request)
+    public function criarContaAction(Request $request): Response
     {
-        try {
-            $serializerService = new SerializerService();
-            $data = json_decode($request->getContent(), true);
-            $usuario = $serializerService->normalizer($data['usuario'], Usuario::class);
-            $errors = $this->validatorService->validate($usuario);
+        $usuario = $this->usuarioService->cadastrarUsuario($request->getContent());
 
-            if ($errors) {
-                return $this->json(['errors' => $errors]);
-            }
-
-            $this->usuarioService->cadastrarUsuario($data);
-
-            return $this->json(['msg' => 'Usuário cadastrado com sucesso!', 'usuario' => $usuario]);
-        } catch (Throwable $exception) {
-            return $this->json($exception->getMessage(), Response::HTTP_BAD_REQUEST);
+        if ($usuario instanceof Usuario) {
+            return $this->jsonResponseService->success(['usuario' => $usuario->toArray()]);
         }
+
+        return $this->jsonResponseService->badRequest(['errors' => $usuario]);
     }
 }
