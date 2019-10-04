@@ -24,19 +24,21 @@ class Usuario
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Assert\NotBlank()
+     * @Assert\NotBlank(message="O nome é obrigatório.")
      * @Serializer\Type("string")
      */
     private $nome;
 
     /**
      * @ORM\Column(type="string", length=50, unique=true)
+     * @Assert\NotBlank(message="O login é obrigatório.")
      * @Serializer\Type("string")
      */
     private $login;
 
     /**
      * @ORM\Column(type="string", length=255, unique=true)
+     * @Assert\NotBlank(message="O email é obrigatório.")
      * @Assert\Email(message="Esse não é um email válido.")
      * @Serializer\Type("string")
      */
@@ -44,9 +46,11 @@ class Usuario
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\NotBlank(message="A senha é obrigatória.")
      * @Assert\Regex(
      *     "/(?=^.{6,}$)(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?!.*\s).*$/",
-     *      message="A senha deve conter pelo menos 6 caracteres e contendo pelo menos uma letra minúscula, uma letra maiúscula e números"
+     *      message="A senha deve conter pelo menos 6 caracteres e contendo pelo menos uma letra minúscula, uma letra
+     *      maiúscula e números"
      * )
      * @Serializer\Type("string")
      */
@@ -121,5 +125,19 @@ class Usuario
         $this->is_autenticado = $is_autenticado;
 
         return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function toArray() {
+        return [
+          'id' => $this->getId(),
+          'nome' => $this->getNome(),
+          'login' => $this->getLogin(),
+          'email' => $this->getEmail(),
+          'senha' => $this->getSenha(),
+          'is_autenticado' => $this->getIsAutenticado()
+        ];
     }
 }

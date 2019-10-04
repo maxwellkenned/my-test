@@ -2,7 +2,7 @@
 
 namespace App\Service;
 
-use JMS\Serializer\SerializerBuilder;
+use JMS\Serializer\SerializationContext;
 use JMS\Serializer\SerializerInterface;
 
 /**
@@ -14,14 +14,16 @@ class SerializerService
 {
 
     /** @var SerializerInterface */
-    private $_serializer;
+    private $serializer;
 
     /**
      * SerializerService constructor.
+     *
+     * @param SerializerInterface $serializer
      */
-    public function __construct()
+    public function __construct(SerializerInterface $serializer)
     {
-        $this->_serializer = SerializerBuilder::create()->build();
+        $this->serializer = $serializer;
     }
 
     /**
@@ -30,9 +32,9 @@ class SerializerService
      *
      * @return string
      */
-    public function serializer($data, string $format = 'json'): ?string
+    public function toJson($data, string $format = 'json'): ?string
     {
-        return $this->_serializer->serialize($data, $format);
+        return $this->serializer->serialize($data, $format);
     }
 
     /**
@@ -42,9 +44,9 @@ class SerializerService
      *
      * @return mixed
      */
-    public function deserializer(string $jsonData, string $type, string $format = 'json')
+    public function converter(string $jsonData, string $type, string $format = 'json')
     {
-        return $this->_serializer->deserialize($jsonData, $type, $format);
+        return $this->serializer->deserialize($jsonData, $type, $format);
     }
 
     /**
@@ -54,10 +56,26 @@ class SerializerService
      *
      * @return mixed
      */
-    public function normalizer(array $data, string $type, string $format = 'json')
+    public function normalizer($data, string $type, string $format = 'json')
     {
-        $jsonData = $this->serializer($data, $format);
+        $data = is_string($data) ? json_decode($data, true) : $data;
+        $jsonData = $this->toJson($data, $format);
 
-        return $this->deserializer($jsonData, $type, $format);
+        return $this->converter($jsonData, $type, $format);
+    }
+
+    /**
+     * @param       $data
+     * @param array $groups
+     *
+     * @return string
+     */
+    public function toJsonByGroups($data, array $groups = ['default']): ?string
+    {
+        return $this->serializer->serialize(
+            $data,
+            'json',
+            SerializationContext::create()->setGroups($groups)
+        );
     }
 }
