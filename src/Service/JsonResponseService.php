@@ -1,9 +1,7 @@
 <?php
 
-
 namespace App\Service;
 
-use App\Entity\DataTransferObject\SimpleMessageDTO;
 use JMS\Serializer\Serializer;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -37,9 +35,12 @@ class JsonResponseService
     {
         $arrayObjeto = [$objeto];
         $vazio = true;
-        array_walk_recursive($arrayObjeto, function ($item) use (&$vazio) {
-            $vazio = $vazio && !is_bool($item) && !is_numeric($item) && empty($item);
-        });
+
+        array_walk_recursive($arrayObjeto,
+            function ($item) use (&$vazio) {
+                $vazio = $vazio && !is_bool($item) && !is_numeric($item) && empty($item);
+            }
+        );
 
         $codigoResposta = $vazio ? Response::HTTP_NO_CONTENT : Response::HTTP_OK;
 

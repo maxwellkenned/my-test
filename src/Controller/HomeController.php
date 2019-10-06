@@ -2,10 +2,7 @@
 
 namespace App\Controller;
 
-use App\Entity\Usuario;
-use App\Service\SerializerService;
-use JMS\Serializer\Serializer;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use FOS\RestBundle\Controller\AbstractFOSRestController;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
@@ -13,7 +10,7 @@ use Symfony\Component\Routing\Annotation\Route;
  *
  * @package App\Controller
  */
-class HomeController extends AbstractController
+class HomeController extends AbstractFOSRestController
 {
 
     /**

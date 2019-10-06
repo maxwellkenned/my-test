@@ -1,5 +1,5 @@
-# This file is auto-generated during the composer install
 parameters:
+    #    Banco MySql
     database_driver: pdo_mysql
     database_version: 5.7
     database_user: root
@@ -7,4 +7,14 @@ parameters:
     database_host: localhost
     database_port: 3306
     database_dbname: my_test
+
     sendgrid_api_key: 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
+
+#    #   Banco Postgresql
+#    database_driver: pdo_pgsql
+#    database_version: 9.6
+#    database_user: 'postgres'
+#    database_password: 'postgres'
+#    database_host: 'localhost'
+#    database_port: '5432'
+#    database_dbname: 'my_test'

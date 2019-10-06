@@ -2,7 +2,6 @@
 
 namespace App\Service;
 
-use JMS\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
