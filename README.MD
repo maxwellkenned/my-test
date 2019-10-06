@@ -5,12 +5,13 @@
 ##### 1. Clone o projeto:
     git clone https://github.com/maxwellkenned/my-test.git
 
-##### 2. Instale as dependências:
-    composer install
+##### 2. Configure as informações do banco de dados:
+    Acesse o seguinte arquivo para configurar as variaveis de acesso ao banco de dados:
+    config/packages/parameters.yaml.dist
 
-##### 3. Configure as informações do banco de dados:
-    acesse o seguinte arquivo para configurar as valiaveis de acesso ao banco:
-    config/packages/parameters.yaml
+
+##### 3. Instale as dependências:
+    composer install
                                                   
 ##### 4. Crie o Banco de dados:
     php bin/console doctrine:database:create

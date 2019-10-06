@@ -4,8 +4,10 @@ namespace App\Service;
 
 use App\Entity\Usuario;
 use App\Repository\UsuarioRepository;
+use App\Service\Email\EmailService;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\ORMException;
+use SendGrid\Mail\TypeException;
 
 /**
  * Class UsuarioService
@@ -20,53 +22,89 @@ class UsuarioService
     /** @var SerializerService */
     private $serializerService;
 
-    /** @var JsonResponseService */
-    private $jsonResponseService;
-
     /** @var ValidatorService */
     private $validatorService;
+
+    /** @var EmailService */
+    private $emailService;
 
     /**
      * UsuarioService constructor.
      *
-     * @param UsuarioRepository   $usuarioRepository
-     * @param SerializerService   $serializerService
-     * @param JsonResponseService $jsonResponseService
-     * @param ValidatorService    $validatorService
+     * @param UsuarioRepository $usuarioRepository
+     * @param SerializerService $serializerService
+     * @param ValidatorService  $validatorService
+     * @param EmailService      $emailService
      */
     public function __construct(
         UsuarioRepository $usuarioRepository,
         SerializerService $serializerService,
-        JsonResponseService $jsonResponseService,
-        ValidatorService $validatorService
+        ValidatorService $validatorService,
+        EmailService $emailService
     ) {
         $this->usuarioRepository = $usuarioRepository;
         $this->serializerService = $serializerService;
-        $this->jsonResponseService = $jsonResponseService;
         $this->validatorService = $validatorService;
+        $this->emailService = $emailService;
     }
 
     /**
-     * @param $usuario
+     * @param $data
      *
      * @return mixed
      * @throws ORMException
      * @throws OptimisticLockException
+     * @throws TypeException
      */
-    public function cadastrarUsuario($usuario)
+    public function cadastrarUsuario($data)
     {
-        $usuario = $this->serializerService->normalizer($usuario, Usuario::class);
+        /** @var Usuario $usuario */
+        $usuario = $this->serializerService->normalizer($data, Usuario::class);
         $errors = $this->validatorService->validate($usuario);
 
         if ($errors) {
             return $errors;
         }
-        
+
         $usuario->setSenha($this->gerarSenhaHash($usuario->getSenha()));
+        $usuario->setHashAtivacao(md5($usuario->getId()));
 
         $this->usuarioRepository->save($usuario);
+        $this->emailService->emailValidacaoLogin($usuario);
 
         return $usuario;
+    }
+
+    /**
+     * @param int $id
+     *
+     * @return Usuario|null
+     */
+    public function find(int $id): ?Usuario
+    {
+        return $this->usuarioRepository->find($id);
+    }
+
+    /**
+     * @param array      $criteria
+     * @param array|null $orderBy
+     *
+     * @return Usuario|null
+     */
+    public function findOneBy(array $criteria, array $orderBy = null): ?Usuario
+    {
+        return $this->usuarioRepository->findOneBy($criteria, $orderBy);
+    }
+
+    /**
+     * @param Usuario $usuario
+     *
+     * @throws ORMException
+     * @throws OptimisticLockException
+     */
+    public function update(Usuario $usuario): void
+    {
+        $this->usuarioRepository->update($usuario);
     }
 
     /**

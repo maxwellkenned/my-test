@@ -1,6 +1,3 @@
-imports:
-    - { resource: 'parameters.yaml' }
-
 doctrine:
     dbal:
         default_connection: default
