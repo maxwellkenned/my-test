@@ -54,7 +54,6 @@ class UsuarioService
      * @return mixed
      * @throws ORMException
      * @throws OptimisticLockException
-     * @throws TypeException
      */
     public function cadastrarUsuario($data)
     {

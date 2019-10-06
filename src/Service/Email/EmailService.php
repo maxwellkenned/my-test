@@ -3,10 +3,12 @@
 namespace App\Service\Email;
 
 use App\Entity\Usuario;
+use App\Exception\TemplateNotFoundException;
 use http\Exception\BadMessageException;
 use SendGrid;
 use SendGrid\Mail\Mail;
 use SendGrid\Response;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Throwable;
 
 class EmailService
@@ -14,12 +16,17 @@ class EmailService
     /** @var SendGrid */
     private $sendGrid;
 
+    private $templating;
+
     /**
      * EmailService constructor.
+     *
+     * @param ContainerInterface $container
      */
-    public function __construct()
+    public function __construct(ContainerInterface $container)
     {
         $this->sendGrid = new SendGrid(getenv('SENDGRID_API_KEY'));
+        $this->templating = $container->get('twig');
     }
 
     /**
@@ -40,17 +47,20 @@ class EmailService
      * @param Usuario $usuario
      *
      * @return Response
-     * @throws SendGrid\Mail\TypeException
      */
     public function emailValidacaoLogin(Usuario $usuario): Response
     {
-        $email = new Mail();
-        $email->setFrom('validation@mytest.com', 'validation');
-        $email->addTo($usuario->getEmail(), $usuario->getNome());
-        $email->setSubject('Email de Validação');
-        $email->addContent('text/html', $this->templateValidacao($usuario));
+        try {
+            $email = new Mail();
+            $email->setFrom('validation@mytest.com', 'Email de validação');
+            $email->addTo($usuario->getEmail(), $usuario->getNome());
+            $email->setSubject('Email de Validação');
+            $email->addContent('text/html', $this->templateValidacao($usuario));
 
-        return $this->enviarEmail($email);
+            return $this->enviarEmail($email);
+        } catch (Throwable $e) {
+            throw new \DomainException($e->getMessage());
+        }
     }
 
     /**
@@ -60,14 +70,10 @@ class EmailService
      */
     private function templateValidacao(Usuario $usuario): string
     {
-        $link = 'http://localhost:8000/autenticacao/ativacao/' . $usuario->getHashAtivacao();
-
-        $html = '<html><body>';
-        $html .= '<span>Confirme seu email clicando no link de validação abaixo:</span>';
-        $html .= '<br/>';
-        $html .= "<a href='{$link}'> Clique aqui! </a>";
-        $html .= '</body></html>';
-
-        return $html;
+        try {
+            return $this->templating->render('email/validacao.html.twig', ['hash' => $usuario->getHashAtivacao()]);
+        } catch (Throwable $e) {
+            throw new TemplateNotFoundException($e->getMessage());
+        }
     }
 }
