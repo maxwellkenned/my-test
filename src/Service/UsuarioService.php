@@ -64,9 +64,9 @@ class UsuarioService
         if ($errors) {
             return $errors;
         }
-
+        
         $usuario->setSenha($this->gerarSenhaHash($usuario->getSenha()));
-        $usuario->setHashAtivacao(md5($usuario->getId()));
+        $usuario->setHashAtivacao(md5($usuario->getLogin()));
 
         $this->usuarioRepository->save($usuario);
         $this->emailService->emailValidacaoLogin($usuario);
