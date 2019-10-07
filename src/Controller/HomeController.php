@@ -12,7 +12,6 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class HomeController extends AbstractFOSRestController
 {
-
     /**
      * @Route("/", name="home", methods={"GET"})
      */

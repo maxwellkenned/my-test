@@ -68,7 +68,12 @@ class UsuarioController extends AbstractFOSRestController
         $usuario = $this->usuarioService->cadastrarUsuario($request->getContent());
 
         if ($usuario instanceof Usuario) {
-            return $this->jsonResponseService->success(['usuario' => $usuario->toArray()]);
+            return $this->jsonResponseService->success(
+                [
+                    'msg' => 'Email de validacao enviado com sucesso!',
+                    'usuario' => $usuario->toArray()
+                ]
+            );
         }
 
         return $this->jsonResponseService->badRequest(['errors' => $usuario]);

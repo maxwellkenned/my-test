@@ -42,7 +42,7 @@ class AutenticacaoController extends AbstractFOSRestController
     }
 
     /**
-     * @Route("/entrar", name="entrar", methods={"GET"})
+     * @Rest\Get("/entrar", name="entrar")
      *
      * @return JsonResponse
      */
@@ -75,9 +75,11 @@ class AutenticacaoController extends AbstractFOSRestController
     /**
      * @Rest\Get("/ativacao/reenviar/{usuario}", name="reenviar_ativacao")
      * @ParamConverter("usuario", class="App\Entity\Usuario")
-     * @param $usuario
+     * @param Usuario $usuario
      *
      * @return Response
+     * @throws ORMException
+     * @throws OptimisticLockException
      */
     public function reenviarAtivacaoAction(Usuario $usuario): Response
     {

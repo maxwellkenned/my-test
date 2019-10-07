@@ -9,6 +9,7 @@
         "friendsofsymfony/rest-bundle": "^2.5",
         "incenteev/composer-parameter-handler": "~2.0",
         "jms/serializer-bundle": "^3.4",
+        "nelmio/cors-bundle": "^1.5",
         "sendgrid/sendgrid": "~7",
         "sensio/framework-extra-bundle": "^5.4",
         "symfony/console": "4.3.*",

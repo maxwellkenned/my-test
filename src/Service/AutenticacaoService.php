@@ -45,7 +45,14 @@ class AutenticacaoService
 
         $this->usuarioService->update($usuario);
     }
-    
+
+    /**
+     * @param Usuario $usuario
+     *
+     * @return \SendGrid\Response
+     * @throws ORMException
+     * @throws OptimisticLockException
+     */
     public function reenviarAtivacao(Usuario $usuario)
     {
         if (!$usuario) {
@@ -57,6 +64,7 @@ class AutenticacaoService
         $usuario->setHashAtivacao($newHash);
 
         $this->usuarioService->update($usuario);
-        $this->emailService->emailValidacaoLogin($usuario);
+
+        return $this->emailService->emailValidacaoLogin($usuario);
     }
 }
