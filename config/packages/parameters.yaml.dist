@@ -3,12 +3,10 @@ parameters:
     database_driver: pdo_mysql
     database_version: 5.7
     database_user: root
-    database_password: root
+    database_password: docker
     database_host: localhost
     database_port: 3306
     database_dbname: my_test
-
-    sendgrid_api_key: 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
 
 #    #   Banco Postgresql
 #    database_driver: pdo_pgsql
